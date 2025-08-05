@@ -1,4 +1,7 @@
+import { DisplayCard, DisplayCardProps } from "@/components/display-card";
 import { cn } from "@/lib/utils";
+import { Product } from "@/types/product";
+import Link from "next/link";
 import { PropsWithChildren } from "react";
 
 interface CodeProps extends PropsWithChildren {
@@ -18,7 +21,25 @@ function Code({ children, className }: CodeProps) {
   );
 }
 
-export default function Home() {
+type ProductPreview = Pick<
+  DisplayCardProps,
+  "title" | "description" | "imageUrl"
+>;
+
+async function getProducts(limit = 2): Promise<ProductPreview[]> {
+  const res = await fetch(`https://dummyjson.com/products?limit=${limit}`);
+  const { products } = await res.json();
+
+  return products.map((product: Product) => ({
+    title: product.title,
+    description: product.description,
+    imageUrl: product.thumbnail,
+  }));
+}
+
+export default async function Home() {
+  const [firstProduct, secondProduct] = await getProducts();
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="border rounded-lg px-6 py-8 mt-10 bg-white shadow-sm">
@@ -152,19 +173,44 @@ export default function Home() {
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-medium mb-3">Default Variant</h3>
-            <div className="bg-white p-4 border rounded border-dashed">
-              <p className="text-gray-500 text-center">
-                Your default DisplayCard components go here
-              </p>
+            <div className="bg-white p-4 border rounded border-dashed flex justify-center">
+              <DisplayCard
+                title={firstProduct.title}
+                description={firstProduct.description}
+                imageUrl={firstProduct.imageUrl}
+              >
+                <Link
+                  href="https://www.orderful.com/blog/best-edi-platforms-food-beverage"
+                  className="mt-4 inline-block w-full sm:w-auto text-center
+                             rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-mono font-medium text-white
+                             transition-colors hover:bg-indigo-500
+                             focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2"
+                >
+                  View product
+                </Link>
+              </DisplayCard>
             </div>
           </div>
 
           <div>
             <h3 className="text-lg font-medium mb-3">Featured Variant</h3>
-            <div className="bg-white p-4 border rounded border-dashed">
-              <p className="text-gray-500 text-center">
-                Your featured DisplayCard components go here
-              </p>
+            <div className="bg-white p-4 border rounded border-dashed flex justify-center">
+              <DisplayCard
+                title={secondProduct.title}
+                description={secondProduct.description}
+                imageUrl={secondProduct.imageUrl}
+                featured
+              >
+                <Link
+                  href="https://www.orderful.com/blog/best-edi-platforms-food-beverage"
+                  className="mt-4 inline-block w-full sm:w-auto text-center
+                             rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-mono font-medium text-white
+                             transition-colors hover:bg-indigo-500
+                             focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2"
+                >
+                  View product
+                </Link>
+              </DisplayCard>
             </div>
           </div>
         </div>
